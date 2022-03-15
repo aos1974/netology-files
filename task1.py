@@ -28,10 +28,10 @@ def load_cook_book (f_name: str, c_book: dict) -> bool:
         return False
     
     # открываем файл и загружаем рецепты
-    with open(f_name, 'r') as cb_file:
+    with open(f_name, 'r', encoding='UTF-8') as cb_file:
         key = ''
         cnt = 0
-        for line in f_name:
+        for line in cb_file:
             # убираем лишние пробелы и спецсимволы в начале и конце строки
             line = line.strip()
             # если загружена пустая строка, то это начало нового блока загрузки

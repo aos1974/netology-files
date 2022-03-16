@@ -68,6 +68,31 @@ def load_cook_book (f_name: str, c_book: dict) -> bool:
 
     return True
 
+# функция составления списка закупок на основе заказанных блюд и кол-ва гостей
+def get_shop_list_by_dishes(dishes: list, person_count: int) -> dict:
+
+    # список закупок
+    shop_list = {}
+
+    # перебираем все блюда в заказе и делаем расчет
+    for dish in dishes:
+        # пропускаем блюдо если его нет в списке рецептов
+        if dish not in cook_book.keys():
+            continue
+        # состав блюда
+        cook_list = list(cook_book.get(dish))
+        # выполняем расчет
+        for ingredient in cook_list:
+            if ingredient['ingredient_name'] in shop_list.keys():
+                qt = shop_list[ingredient['ingredient_name']]['quantity']
+                qt += ingredient['quantity'] * person_count
+                shop_list[ingredient['ingredient_name']]['quantity'] = qt
+            else:
+                shop_list[ingredient['ingredient_name']] = {'measure': ingredient['measure'], 'quantity': ingredient['quantity'] * person_count}
+    # конец расчета
+
+    return shop_list
+
 #
 # Главная функция программы
 #
@@ -81,7 +106,29 @@ def main() -> bool:
 
     # выводим загруженные рецепты на экран
     print(f'Загружены следующие рецепты из файла {RECIPES_FILE}:')
-    print(cook_book)
+    print(list(cook_book.keys()))
+
+    # получаем заказ
+    print('Введите заказ или "q" для завершения ввода:')
+    order = []
+    i = 0
+    while True:
+        order.append(input('Название блюда (или "q" для завершения): '))
+        if order[i] == 'q':
+            del order[i]
+            break
+        else:
+            i += 1
+    # количество гостей
+    person_count = int(input('Введите кол-во гостей: '))
+
+    # выполняем расчет листа закупок для приготовления блюд из заказа
+    shop_list = get_shop_list_by_dishes(order, person_count)  
+
+    # вывод результатов расчета  
+    print('\nНеобходимы следующие ингридиенты для заказа:\n')
+    for ingredient in shop_list:
+        print(ingredient, shop_list[ingredient])
 
     return True
 
